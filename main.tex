@@ -1,0 +1,47 @@
+\documentclass{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{xcolor}
+
+\usepackage{listings}
+\usepackage{mdframed}
+\usepackage{fourier}
+
+\lstset{
+	basicstyle=\small,
+	keywordstyle=\color{black}\bfseries
+}
+
+\usepackage{enumerate}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[colorlinks=True]{hyperref}
+
+\title{Notes \\ Seminar on Machine Learning and Neural Networks}
+\date{}
+\author{}
+
+\DeclareMathOperator{\Inp}{Inp}
+\DeclareMathOperator{\Tr}{Tr}
+
+\setlength{\parskip}{\smallskipamount}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\maketitle
+
+% \chapter*{Preface}
+
+% This notes are the result of a seminar that took place on the first semester of 12018 at the National University of Colombia at Medellín. The objective of the seminar was to cover the basics of Machine Learning needed to understand neural networks. To do so, we followed a rather theoretical approach to the subject. Our main references were \cite{bishop1} and \cite{bishop2} (and these books are so well made that most of our notes are almost verbatum copies from them). For a holistic understanding of the subject, though, we implemented most examples using python and R and following a [MOOC] on Udemy.
+
+\include{chapter1_linear_regression}
+
+\include{chapter2_linear_classification}
+
+\end{document}
