@@ -1,0 +1,28 @@
+
+\chapter{Feed-Forward Neural Networks}
+
+When trying to model the functional relation between values in a dataset $\mathcal{D} = \{(\vec{x}_n, \vec{t}_n)\}_{n=1}^N$, we have tried to fit an approximating function of the form
+
+\[\vec{y}(\vec{x};w) = \sum_{i=0}^{M-1}\phi_i(\vec{x})w_i\]
+
+where $\phi(\vec{x}) = (1, \phi_1(\vec{x}), \dots, \phi_{M-1}(\vec{x}))$ are basis functions defined \textit{a priori} by the modeler. In classification, for example, it was essential to select $\phi$ in such a way that the set $\widetilde{\mathcal{D}} = \{(\phi(\vec{x}_n), \vec{t}_n)\}_{n=1}^N$ were linearly separable (which is, indeed, asking too much).
+
+The idea of (Artificial) Feed-Forward Neural Networks is to add more flexibility to the model by turning these basis functions into a non-linear transformation of a linear combination of the input variables with parameters. That is, the model in this case looks like this:
+
+\begin{equation}\label{eq:3.FFNN}
+\vec{y}(x;w) = \sigma_{d}\left(W^T_{(d)}\sigma_{d-1}(W^T_{(d-1)}\cdots\sigma_1(W^T_{(1)}\vec{x} + \vec{b}_{(1)})+\vec{b}_{(2)})\cdots+\vec{b}_{(d)}\right)
+\end{equation}
+
+Where $w = (W_{(t)}, \vec{b}_{t})_{t=1}^d$ are matrices and vectors with parameters and $\sigma_1,\dots,\sigma_d$ are called \textbf{activation functions}. We call $d$ the amount of layers in the neural network. We can represent this fact visually using \textbf{computation graphs} (our local name, it seems like it isn't a generalized term).
+
+\section{Computation graphs}
+
+We will end up representing our model using a directed acyclical graph. In this graph, the edges will represent our parameters and the nodes will represent values that are computed in the following way: the value in node $v$ is given by
+
+\[v = \sigma\left(\sum_{u\to v}w(u,v)\cdot u\right)\]
+
+[figure1]
+
+Using this language, the model (\ref{eq:3.FFNN}) can be described by a directed acyclical $d$-partite graph, in which the connections between the $d$ parts are complete. This graph can be found in figure [figure2]. 
+
+[figure2]

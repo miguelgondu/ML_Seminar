@@ -45,13 +45,14 @@ def poly_fit(x, t, m):
 \end{lstlisting}	
 \end{mdframed}
 
-Consider this example: say we want to fit a set $\{(x_1, t_1),\dots,(x_{10},t_{10})\}$ that come from the function $y=\sin(2\pi x)$ plus some noise that's distributed normally with mean $0$ and variance $0.1$. After implementing this algorithm, here are the approximations for orders 1, 4 and 9:
-
-\begin{figure}[H]
+\begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{images/overfitting.pdf}
+	\includegraphics[width=0.7\textwidth]{images/overfitting.pdf}
 	\caption{An example of polynomial fitting for $\sin(x) + \epsilon$ for a random noise $\epsilon$.}
+	\label{fig:1.overfitting}
 \end{figure}
+
+Consider this example: say we want to fit a set $\{(x_1, t_1),\dots,(x_{10},t_{10})\}$ that come from the function $y=\sin(2\pi x)$ plus some noise that's distributed normally with mean $0$ and variance $0.1$. After implementing this algorithm, the aproximations for $M = 1, 4, 9$ can be found in figure \ref{fig:1.overfitting}
 
 At $m=1$ we're barely approximating the points, at $m=4$ we're approximating $\sin(x)$ rather well and at $m=9$ the parameters become so finely tuned that the polynomial passes almost exactly through the points, but at the cost of enormous oscilations near the endpoints. We see, then, that if we assume that the points come from some sort of pattern ($y = \sin(x)$ in this case), using a lot of parameters works against us. This is known as \textbf{overfitting}.
 
@@ -100,9 +101,9 @@ For some constant $C$. Focusing on the part that concerns $w$ we get the \textbf
 
 By taking into account the quadratic term on the parameters, we're forcing the system to avoid overfitting, which usually occurs when the parameter get big in size. The normal equations of such a system is only modified by the addition of a \textit{diagonal} term. One usually modifies $E_{\tiny\mbox{MAP}}(w)$ by dividing it by $\beta$ and calling $\lambda = \alpha/\beta$. This parameter $\lambda$ measures the relevance of this regularizing parameter.
 
-\begin{figure}[H]
+\begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{images/regularization.pdf}
+	\includegraphics[width=0.7\textwidth]{images/regularization.pdf}
 	\caption{Regularization of sum-of-squares with multiple values for $\lambda$.}
 \end{figure}
 

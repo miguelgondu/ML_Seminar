@@ -11,6 +11,7 @@
 \usepackage{listings}
 \usepackage{mdframed}
 \usepackage{fourier}
+\usepackage{fullpage}
 
 \lstset{
 	basicstyle=\small,
@@ -27,6 +28,7 @@
 \author{}
 
 \DeclareMathOperator{\Inp}{Inp}
+\DeclareMathOperator{\Val}{Val}
 \DeclareMathOperator{\Tr}{Tr}
 
 \setlength{\parskip}{\smallskipamount}
@@ -42,126 +44,9 @@
 
 \include{chapter1_linear_regression}
 
-\chapter{Linear Classification}
+\include{chapter2_linear_classification}
 
-Classification problems consist on constructing a model that takes every $x$ in the input space and maps it to a discrete set $\{C_1,\dots, C_K\}$ of \textit{classes}, given that we already have a set of classified data $\mathcal{D} = \{(x_i, t_i)\}_{i=1}^N$. There are plenty of examples of real life problems that require a classification, for example
-\begin{itemize}
-	\item We have diagnostic images of a liver, and we want to determine wheter a new patient has liver cancer or not.
-
-	\item We have a collection of labeled handwritten digits (such as \href{http://yann.lecun.com/exdb/mnist/}{the MNIST database}), and we want to determine which digit appears in a new image.
-
-	\item We have a song, and we want to determine whether it is a happy, upbeat one or a melancholic one.
-
-	\item A bank may have plenty of information about their clients, and may want to construct a model to determine if a new client will default on their credit or not.
-
-	\item \href{https://cs.stanford.edu/people/esteva/nature/}{A Nature article} explains how a model for classifying skin lesions at dermatologist-level was constructed.
-\end{itemize}
-
-Many of these examples may require heavy machinery, but for now we will introduce the models of classification by considering the most basic ones: linear models of classification.
-
-There are three ways to construct a model, and they go (in increasing level of complexity) like this:
-
-\begin{enumerate}[(a)]
-	\item Model a \textbf{discriminant function} $y(x,w)$ that classifies $x$.
-
-	\item Model $P(C_k|x)$ for $k\in\{1,\dots,K\}$ and use this information to take decisions over $x$, such as classifying $x$ to the class $C_k$ such that $P(C_k|x) \geq P(C_j|x)$ for all $j\in\{1,\dots, K\}$. Such models are called \textbf{Probabilistic Discriminant Functions}, because the $y_k(x) = P(C_k|x)$ now serve as discriminant functions.
-
-	\item Model $P(x|C_k)$ and $P(C_k)$ (i.e. modeling the joint distribution $P(x, C_k)$) and then use Bayes to get $P(C_k|x)$. These models are called \textbf{Generative Models}, because we can marginalize the joint distribution for the $x$ and generate new training data.
-\end{enumerate}
-
-\section{Linear Discriminant Models}
-
-Our first approach to classification will be using linear discriminant models, we will learn the parameters of a series of functions of the form
-
-\[y_k(x,w_k) = w_k^Tx + w_{k0},\, k\in\{1,\dots, K\}\]
-
-such that we classify $x$ to $C_k$ if $y_k(x,w_k) > y_j(x,w_j)$ for all $j\neq k$. Naming names, we call $w_k = (w_{k1},\dots, w_{kK})^T$ the parameters, $w_{k0}$ is a special parameter called the \textbf{bias}, and $-w_{k0}$ is called the \textbf{threshold}. We can get all these linear combinations together into a vector and consider only one discriminant function
-
-\[y(x,w) = \begin{bmatrix}
-	y_1(x,w_1)\\
-	y_2(x,w_2)\\
-	\vdots\\
-	y_K(x,w_K)
-\end{bmatrix} = W^Tx + W_0\]
-
-where $W$ is a matrix whose columns are precisely $w_1, w_2,\dots, w_K$, and $W_0 = (w_{1,0}, w_{2,0},\dots, w_{K,0})^T$. Such a model is usually called a 1-of-$K$ scheme.
-
-\subsection{The geometry of this model}
-
-Let's consider the geometry that such a scheme induces. Call the regions $R_k := \{x\;|\;x \mbox{ is classified to } C_k\}\subseteq \Inp$ and $\partial R_k$ the \textbf{decision boundaries}. We claim that these decision boundaries are hyperplanes and that the $R_k$s are simply connected and convex.
-
-Indeed, the first claim follows from the fact that the decision boundary between $R_i$ and $R_j$ is given by $\{x\;|\;y_i(x) = y_j(x)\}$, because then
-\begin{align*}
-y_i&(x) = y_j(x)\\
-&\Rightarrow w_i^Tx + w_{i0} = w_j^Tx + w_{j0}\\
-&\Rightarrow (w_i - w_j)^Tx + (w_{i0} - w_{j0}) = 0
-\end{align*}
-thus, the decision boundary is given by a hyperplane. Now let's prove that each region is convex and simply connected: let $x,x'\in R_k$, consider then a convex combination $\hat{x} = \lambda x + (1-\lambda)x'$, we need to prove that for every $\lambda\in [0,1]$, $\hat{x}\in R_k$, i.e., $y_k(\hat{x}) > y_j(\hat{x})$ for every $j\neq k$. Indeed,
-
-\begin{align*}
- 	y_k(\hat{x}) &= y_k(\lambda x + (1-\lambda)x')\\
- 	&= w_k^T(\lambda x + (1-\lambda)x') + w_{k0}\\
- 	&= \lambda(w_k^T x + w_{k0}) + (1-\lambda)(w_k^Tx' + w_{k0})\\
- 	&= \lambda y_k(x) + (1-\lambda)y_k(x')\\
- 	&> \lambda y_j(x) + (1-\lambda)y_j(x')\\
- 	&= y_j(\hat{x})
- \end{align*}
-
-(notice that we skipped the same algebraic process between the last steps). This proves that the model we're dealing with splits the regions into convex polytopes. This is a rigid geometry!, we're not to expect that the actual pattern behind the data be \textbf{linearly separable}. This is not generally the case, and we require more sophisticated methods in order to classify data that's not very linearly separable.
-
-\subsection{Learning the parameters}
-
-We now have a linear model, now let's talk about a couple ways we can \textit{learn} the parameters from training data.
-
-\subsubsection{Sum-of-squares}
-
-We can draw an analogy with regression, and try to fit a function using least squares. We could define an error associated with the training data $\mathcal{D} = \{(x_i, t_i)\}_{i=1}^N$:
-
-\[E_\mathcal{D}(w_1,\dots,w_k) = \frac{1}{2}\sum_{k = 1}^K\sum_{n=1}^N(x_n^Tw_k + w_{k0} - t_{nk})^2\]
-
-in order to get the minima of this error, we can rewrite it as the trace of a matrix. Let
-
-\[\widetilde{X} = \begin{bmatrix}
-	1, x_1^T\\
-	% \hline
-	\cdots\\
-	% \hline
-	1, x_N^T
-\end{bmatrix}_{N\times(D+1)} = \begin{bmatrix}
-	\widetilde{x}_1^T\\
-	% \hline
-	\cdots\\
-	\widetilde{x}_N^T
-\end{bmatrix}_{N\times(D+1)}\]
-\[\widetilde{W} = \begin{bmatrix}
-	\widetilde{w}_{1}\,|\,\cdots\,|\,\widetilde{w}_K
-\end{bmatrix}_{(D+1)\times K}\]
-
-where $\widetilde{w}_k = (w_{k0}, w_{k1}, \dots, w_{kK})^T = (w_{k0}, w_k^T)^T$, and finally
-
-\[T = \begin{bmatrix}
-	t_1^T\\
-	\cdots\\
-	t_N^T\\
-\end{bmatrix}_{N\times K} \]
-
-Then the error above defined can be written as
-
-\[E_\mathcal{D}\left(\widetilde{W}\right) = \frac{1}{2}\Tr\left((\widetilde{X}\widetilde{W} - T)^T(\widetilde{X}\widetilde{W} - T)\right)\]
-
-we can differentiate with respect to $\widetilde{W}$ in order to get the minimum, which is given by
-
-\[\widetilde{W}^* = (\widetilde{X}^T\widetilde{X})^{-1}\widetilde{X}^TT\]
-
-Notice that this is the same solution as we got in the linear regression scenario, and that the Moore-Penrose pseudoinverse pops up once more.
-
-\subsubsection{The perceptron algorithm}
-
-[to be filled]
-
-\section{Probabilistic Discriminative Models}
-
-
+\include{chapter3_neural_networks}
 
 
 
